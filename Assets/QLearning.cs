@@ -78,7 +78,12 @@ public class QLearning : MonoBehaviour
         }
         else if (!finAprendizaje)
         {
-            print(dictionaryQ1.ToString());
+            //print(dictionaryQ1.ToString()); //NOPE
+            foreach (KeyValuePair<string, float> kvp in dictionaryQ1)
+            {
+                //textBox3.Text += ("Key = {0}, Value = {1}", kvp.Key, kvp.Value);
+                print(string.Format("Key = {0}, Value = {1}", kvp.Key, kvp.Value));
+            }
             finAprendizaje = true;
         }
         
@@ -182,20 +187,22 @@ public class QLearning : MonoBehaviour
             builder[jugadaRandom] = equis;
             estadoDespuesJugador1 = builder.ToString();
 
-            print("Actual: " + estadoActualJugador1);
+            //print("Actual: " + estadoActualJugador1);
             print("Jugada: " + jugadaRandom);
-            print("Despues: " + estadoDespuesJugador1);
+            print("Random J1: " + estadoDespuesJugador1);
 
         }
         else
         {
             //mejor jugada
             float maximo = -1.0f;
-            int mejorJugada = 0; 
+             
             float value;
-            for (int i = 1; i < 10; i++)
+            int[] posiblesJugadas = PosiblesJugadas(estadoActualJugador1);
+            int mejorJugada = posiblesJugadas[0];
+            for (int i = 1; i < posiblesJugadas.Length; i++)
             {
-                if (dictionaryQ1.TryGetValue((estadoActualJugador1 + i), out value))
+                if (dictionaryQ1.TryGetValue((estadoActualJugador1 + (posiblesJugadas[i]+1)), out value))
                 {
                     if (value > maximo)
                     {
@@ -211,9 +218,9 @@ public class QLearning : MonoBehaviour
             builder[mejorJugada] = equis;
             estadoDespuesJugador1 = builder.ToString();
 
-            print("Actual: " + estadoActualJugador1);
+            //print("Actual: " + estadoActualJugador1);
             print("Jugada: " + mejorJugada);
-            print("Despues: " + estadoDespuesJugador1);
+            print("Mejor Jugada J1: " + estadoDespuesJugador1);
 
         }
 
@@ -285,7 +292,7 @@ public class QLearning : MonoBehaviour
 
     private void TurnoJugador2()
     {
-        print("Actual: " + estadoDespuesJugador1);
+        //print("Actual: " + estadoDespuesJugador1);
 
         StringBuilder builder = new StringBuilder(estadoDespuesJugador1);
 
@@ -297,7 +304,7 @@ public class QLearning : MonoBehaviour
         //estado despues se queda si actualizar, ya lo hara quando juegue J1
 
         print("Jugada: " + jugadaRandom);
-        print("Despues: " + estadoActualJugador1);
+        print("Jugada J2: " + estadoActualJugador1);
     }
 
     private void FinPartida()
@@ -331,11 +338,11 @@ public class QLearning : MonoBehaviour
 			}
 		}
 
-		if(tablero[0, 0].Equals(ficha) && tablero[0, 0].Equals(tablero[1, 1]) && tablero[0, 0].Equals(tablero[2,2])){
+		if(tablero[0, 0].Equals(ficha) && tablero[0, 0].Equals(tablero[1, 1]) && tablero[0, 0].Equals(tablero[2,2])){ //  si es \
 				return true;
 		}
 
-		if(tablero[2,0].Equals(ficha) && tablero[2,0].Equals(tablero[1,1]) && tablero[0,0].Equals(tablero[0,2])){
+		if(tablero[2,0].Equals(ficha) && tablero[2,0].Equals(tablero[1,1]) && tablero[2,0].Equals(tablero[0,2])){ //  si es /
 				return true;
 		}
 
