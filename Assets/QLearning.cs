@@ -9,19 +9,13 @@ public class QLearning : MonoBehaviour
     public int totalPartidasAprendizaje;
 
     private Dictionary<string, float> dictionaryQ1;
-    //private Dictionary<string, float> dictionaryQ2;
 
     private string estadoActualJugador1;
     private string estadoDespuesJugador1;
 
-    //private string estadoActualJugador2;
-
     private string jugadaJugador1;
-    //private string jugadaJugador2;
-
 
     private float rewardCortoPlazoJugador1;
-    //private float rewardJugador2;
 
     private float epsilon;
     private float velocidadAprendizaje; //0 significa que no aprendemos nada de una nueva experiencia, y 1 significa que olvidamos todo lo que sabíamos hasta ahora y nos fiamos completamente de la nueva experiencia
@@ -46,21 +40,30 @@ public class QLearning : MonoBehaviour
         factorDescuento = 0.8f;
         rewardCortoPlazoJugador1 = 0;
         cantidadDePartidasJugadas = 0;
+        totalPartidasAprendizaje = 1000;
         dictionaryQ1 = new Dictionary<string, float>();
-        //dictionaryQ2 = new Dictionary<string, float>();
 
         epsilon = 0.8f;
-
-        //estadoActualJugador1 = "---------";
         
-        
-        for(int i = 0 ; i < 9 ; i++){
+        for(int t = 0 ; t < 9 ; t++){
             estadoActualJugador1 += guion;
 		}
         //Testeando();
         //TurnoJugador1();
     }
+    private void NuevaPartida()
+    {
+        rewardCortoPlazoJugador1 = 0;
+        estadoActualJugador1 = "";
+        for (int v = 0; v < 9; v++)
+        {
+            estadoActualJugador1 += guion;
+        }
+        //estadoDespuesJugador1 se actualiza conforme lo que tenga el estadoActualJugador1
+        //lo mismo con jugadaJugador1
 
+        //AQUIIIIIaqui variaremos el factor de descuento
+    }
 
     void Update()
     {
@@ -72,19 +75,9 @@ public class QLearning : MonoBehaviour
          print(value);*/
 
         
-        if (!finPartida)
+        if (!finAprendizaje)
         {
             TurnoJugador1();
-        }
-        else if (!finAprendizaje)
-        {
-            //print(dictionaryQ1.ToString()); //NOPE
-            foreach (KeyValuePair<string, float> kvp in dictionaryQ1)
-            {
-                //textBox3.Text += ("Key = {0}, Value = {1}", kvp.Key, kvp.Value);
-                print(string.Format("Key = {0}, Value = {1}", kvp.Key, kvp.Value));
-            }
-            finAprendizaje = true;
         }
         
         /*
@@ -143,9 +136,9 @@ public class QLearning : MonoBehaviour
     private int[] PosiblesJugadas(string estadoActual)
     {
         int queCutre =  0;
-        for (int i = 0; i < estadoActual.Length ; i++ )
+        for (int y = 0; y < estadoActual.Length ; y++ )
         {
-            if (estadoActual[i].Equals(guion))
+            if (estadoActual[y].Equals(guion))
             {
                 queCutre++;
             }
@@ -155,11 +148,11 @@ public class QLearning : MonoBehaviour
 
         int contador = 0;
 
-        for (int i = 0; i < estadoActual.Length; i++)
+        for (int p = 0; p < estadoActual.Length; p++)
         {
-            if (estadoActual[i].Equals(guion))
+            if (estadoActual[p].Equals(guion))
             {
-                listaPosiblesJugadas[contador] = i;
+                listaPosiblesJugadas[contador] = p;
                 contador++;
             }
         }
@@ -195,12 +188,15 @@ public class QLearning : MonoBehaviour
         else
         {
             //mejor jugada
-            float maximo = -1.0f;
+            float maximo;
              
             float value;
             int[] posiblesJugadas = PosiblesJugadas(estadoActualJugador1);
             int mejorJugada = posiblesJugadas[0];
-            for (int i = 1; i < posiblesJugadas.Length; i++)
+
+            dictionaryQ1.TryGetValue((estadoActualJugador1 + (posiblesJugadas[0] + 1)), out maximo);
+
+            for (int i = 0; i < posiblesJugadas.Length; i++)
             {
                 if (dictionaryQ1.TryGetValue((estadoActualJugador1 + (posiblesJugadas[i]+1)), out value))
                 {
@@ -249,7 +245,7 @@ public class QLearning : MonoBehaviour
 
 
         }
-        else if (Empate(estadoDespuesJugador1, equis)) //para el jugador 2 el empate es despues de la jugada del jugador 1
+        else if (Empate(estadoDespuesJugador1, guion)) //para el jugador 2 el empate es despues de la jugada del jugador 1
         {
             //si es fin partida supongo que recompensa =0
             //R2t-1 <- 0
@@ -268,7 +264,7 @@ public class QLearning : MonoBehaviour
 
             TurnoJugador2();
 
-            if (Ganado(estadoActualJugador1,laO)) //si el J1 ha perdido
+            if (Ganado(estadoActualJugador1, laO)) //si el J1 ha perdido
             {
                 rewardCortoPlazoJugador1 = -1;
                 float valorJugada;
@@ -277,17 +273,43 @@ public class QLearning : MonoBehaviour
 
                 FinPartida();
             }
+            else {//continua la partida pero hay que actualizar el dato de la jugada
+                rewardCortoPlazoJugador1 = 0;
+                float valorJugada;
+                dictionaryQ1.TryGetValue(jugadaJugador1, out valorJugada); //recuerda, si no existe, devuelve un 0
+
+                //aqui pillar el maximo de posibles jugadas con el estadoActualJugador1 (como si hiciera una jugada pero solo para mirar la tabla)
+
+                //mejor jugada
+                float maximoJugadaFutura; //maximo tendra el valor de la mejor jugada
+                
+                float value;
+                int[] posiblesJugadas = PosiblesJugadas(estadoActualJugador1);
+                dictionaryQ1.TryGetValue((estadoActualJugador1 + (posiblesJugadas[0]+ 1)), out maximoJugadaFutura);
+                int mejorJugada = posiblesJugadas[0];
+                for (int z = 1; z < posiblesJugadas.Length; z++)
+                {
+                    if (dictionaryQ1.TryGetValue((estadoActualJugador1 + (posiblesJugadas[z] + 1)), out value))
+                    {
+                        if (value > maximoJugadaFutura)
+                        {
+                            maximoJugadaFutura = value;
+                            mejorJugada = z;
+                        }
+                    }
+                }
+
+                //string jugadaDelMaximo = estadoActualJugador1 + mejorJugada; //innecesario
+
+
+                dictionaryQ1[jugadaJugador1] = valorJugada + velocidadAprendizaje * (rewardCortoPlazoJugador1 + (factorDescuento * maximoJugadaFutura) - valorJugada); //maximo futuro sera 0 porque no hay mas jugadas despues de ganar
+            }
 
 
 
         }
 
-        //SI NO HAY FIN CONTINUAMOS POR AQUI
-
-        //casi que mjeor si entreno con dos algoridmos distintos
-
-
-
+        //Cul de sac
     }
 
     private void TurnoJugador2()
@@ -309,13 +331,21 @@ public class QLearning : MonoBehaviour
 
     private void FinPartida()
     {
-
+        NuevaPartida(); //ponemos a 0 los datos
         cantidadDePartidasJugadas++;
         if (cantidadDePartidasJugadas>= totalPartidasAprendizaje)
         {
             finAprendizaje = true;
+
+            //print(dictionaryQ1.ToString()); //NOPE
+            foreach (KeyValuePair<string, float> kvp in dictionaryQ1)
+            {
+                //textBox3.Text += ("Key = {0}, Value = {1}", kvp.Key, kvp.Value);
+                print(string.Format("Key = {0}, Value = {1}", kvp.Key, kvp.Value));
+            }
+            //finAprendizaje = true;
         }
-        finPartida = true;
+        //finPartida = true;
     }
 
     private bool Ganado(string jugada, char ficha) //HAY QUE PASARLE LA JUGADA ACTUALIZADA
@@ -331,22 +361,30 @@ public class QLearning : MonoBehaviour
 
 		for ( int x=0;x<3;x++){ // miramos si hay victoria horizontal y vertical
 			if(tablero[x, 0].Equals(ficha) && tablero[x,0].Equals(tablero[x, 1]) && tablero[x, 0].Equals(tablero[x, 2])){
-				return true;
+                print("GANADO: FILA");
+                return true;
+               
 			}
 			else if(tablero[0, x].Equals(ficha) && tablero[0, x].Equals(tablero[1, x]) && tablero[0, x].Equals(tablero[2, x])){
-				return true;
-			}
-		}
+                print("GANADO: COLUMNA");
+                return true;
+               
+            }
+        }
 
 		if(tablero[0, 0].Equals(ficha) && tablero[0, 0].Equals(tablero[1, 1]) && tablero[0, 0].Equals(tablero[2,2])){ //  si es \
-				return true;
-		}
+            print("GANADO: \\");
+            return true;
+                
+        }
 
-		if(tablero[2,0].Equals(ficha) && tablero[2,0].Equals(tablero[1,1]) && tablero[2,0].Equals(tablero[0,2])){ //  si es /
-				return true;
-		}
+        if (tablero[2,0].Equals(ficha) && tablero[2,0].Equals(tablero[1,1]) && tablero[2,0].Equals(tablero[0,2])){ //  si es /
+            print("GANADO: //");
+            return true;
+                
+        }
 
-		return false;
+        return false;
 
     }
     private bool Empate(string jugada, char ficha)
@@ -358,8 +396,9 @@ public class QLearning : MonoBehaviour
                 return false;
             }
         }
-
+        print("EMPATE");
         return true;
+        
 
     }
 
