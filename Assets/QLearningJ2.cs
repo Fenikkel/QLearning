@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Text;
 
-public class QLearning : MonoBehaviour
+public class QLearningJ2 : MonoBehaviour
 {
 
     public int totalPartidasAprendizaje;
 
     private Dictionary<string, float> dictionaryQ1;
 
-    private string estadoActualJugador1;
+    private string estadoActualJugador1; //actual es despues y despues es actual
     private string estadoDespuesJugador1;
 
     private string jugadaJugador1;
@@ -25,10 +25,10 @@ public class QLearning : MonoBehaviour
     private int cantidadDePartidasJugadas;
 
     private const char guion = '-';
-    private const char equis = 'x';
-    private const char laO = 'o';
+    private const char equis = 'o'; //x y o invertidas
+    private const char laO = 'x';
 
-    private bool finAprendizaje = false;
+    private bool finAprendizaje = true;
     private bool finPartida = false;
 
 
@@ -46,92 +46,34 @@ public class QLearning : MonoBehaviour
         epsilon = 0.8f;
         
         for(int t = 0 ; t < 9 ; t++){
-            estadoActualJugador1 += guion;
-		}
-        //Testeando();
-        //TurnoJugador1();
+            //estadoActualJugador1 += guion;
+            estadoDespuesJugador1 += guion;
+        }
+        ParcheTurnoJ1();
     }
     private void NuevaPartida()
     {
         rewardCortoPlazoJugador1 = 0;
         estadoActualJugador1 = "";
+        estadoDespuesJugador1 = "";
         for (int v = 0; v < 9; v++)
         {
-            estadoActualJugador1 += guion;
+            //estadoActualJugador1 += guion;
+            estadoDespuesJugador1 += guion;
         }
-        //estadoDespuesJugador1 se actualiza conforme lo que tenga el estadoActualJugador1
-        //lo mismo con jugadaJugador1
 
-        //AQUIIIIIaqui variaremos el factor de descuento
+        ParcheTurnoJ1();
     }
 
     void Update()
-    {
-        /* //SI NO HAY REFERENCIA A LA KEY DEVUELVE 0
-         bool printeado;
-         float value;
-         printeado = dictionaryQ1.TryGetValue("algo", out value);
-         print(printeado);
-         print(value);*/
-
-        
+    {     
         if (!finAprendizaje)
         {
-            TurnoJugador1();
+            TurnoJ2();
         }
         
-        /*
-        if (!finAprendizaje)
-        {
-            
-            string guiones = "---xxxooo";
-            int[] pos = PosiblesJugadas("---------");
-
-            print(guiones[1].Equals(guion));
-            print(guiones[4].Equals(equis));
-
-            print(guiones[7].Equals(laO));
-
-
-            for (int i =0; i < pos.Length; i++)
-            {
-                print(pos[i]);
-            }
-            //print(pos.ToString());
-            
-            int[] pos = PosiblesJugadas("-x--o--x-");
-            for (int i = 0; i < pos.Length; i++)
-            {
-                print(pos[i]);
-            }
-            
-            //print(pos.ToString());
-            finAprendizaje = true;
-        }
-        */
-
-       
-
-
-
     }
 
-    private void Testeando()
-    {
-        jugadaJugador1 = "---------2";
-        rewardCortoPlazoJugador1 = -1;
-
-        float valorJugada;
-        dictionaryQ1.TryGetValue(jugadaJugador1, out valorJugada); //recuerda, si no existe, devuelve un 0
-
-        //jugada = jugada + velocidad de aprendizaje * (recompensa corto plazo + factor de descuento * maximo de la posible futura jugada - jugada) //el estado inicial antes de hacer la jugada no cuenta para nada
-        print(valorJugada);
-        dictionaryQ1[jugadaJugador1] = valorJugada + velocidadAprendizaje * (rewardCortoPlazoJugador1 + (factorDescuento * 0) - valorJugada); //maximo futuro sera 0 porque no hay mas jugadas despues de ganar
-        dictionaryQ1.TryGetValue(jugadaJugador1, out valorJugada);
-        print(valorJugada);
-
-
-    }
 
     private int[] PosiblesJugadas(string estadoActual)
     {
@@ -160,11 +102,8 @@ public class QLearning : MonoBehaviour
         return listaPosiblesJugadas;
     }
 
-    private void TurnoJugador1() //A VECES HACE LA MISMA JUGADA VARIAS VECES, MIRAR EN LO RANDOM! O SI SE ACTUALIZA MAL LA COSA!
-    { //x
-      //E-greedy y decidimos si lo hacemos al azar  (N<E) o sino miramos el mejor de la fila
-      //Random rnd = new Random();
-      //float randomFloat = rnd.Next(0, 1); // creates a number between 1 and 12
+    private void TurnoJ2() 
+    { 
 
         float number = Random.Range(0.0f, 1.0f);
 
@@ -262,7 +201,7 @@ public class QLearning : MonoBehaviour
         else //ni se empata ni se gana
         { //lo mismo que empate pero sin terminar partida
 
-            TurnoJugador2();
+            TurnoJ1();
 
             if (Ganado(estadoActualJugador1, laO)) //si el J1 ha perdido
             {
@@ -312,7 +251,7 @@ public class QLearning : MonoBehaviour
         //Cul de sac
     }
 
-    private void TurnoJugador2()
+    private void TurnoJ1()
     {
         //print("Actual: " + estadoDespuesJugador1);
 
@@ -327,6 +266,27 @@ public class QLearning : MonoBehaviour
 
         print("Jugada: " + jugadaRandom);
         print("Jugada J2: " + estadoActualJugador1);
+
+        if (Empate(estadoActualJugador1, guion)) //para el jugador 2 el empate es despues de la jugada del jugador 1
+        {
+            
+            FinPartida();
+        }
+    }
+    private void ParcheTurnoJ1()
+    {
+        StringBuilder builder = new StringBuilder(estadoDespuesJugador1);
+
+        int[] posiblesJugadasJ2 = PosiblesJugadas(estadoDespuesJugador1);
+        int jugadaRandom = posiblesJugadasJ2[Random.Range(0, posiblesJugadasJ2.Length - 1)];
+
+        builder[jugadaRandom] = laO;
+        estadoActualJugador1 = builder.ToString();
+        //estado despues se queda si actualizar, ya lo hara quando juegue J1
+
+        print("Jugada: " + jugadaRandom);
+        print("Jugada J2: " + estadoActualJugador1);
+        finAprendizaje = false;
     }
 
     private void FinPartida()
@@ -335,7 +295,7 @@ public class QLearning : MonoBehaviour
         cantidadDePartidasJugadas++;
         //epsilon
         int porcentaje = (100 * cantidadDePartidasJugadas) / 1000;
-        if (porcentaje > 50)
+        if (porcentaje> 50)
         {
             epsilon = 0.7f;
         }
