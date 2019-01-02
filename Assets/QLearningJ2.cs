@@ -28,7 +28,7 @@ public class QLearningJ2 : MonoBehaviour
     private const char equis = 'o'; //x y o invertidas
     private const char laO = 'x';
 
-    private bool finAprendizaje = true;
+    public bool finAprendizaje = true;
     private bool finPartida = false;
 
 
@@ -120,8 +120,8 @@ public class QLearningJ2 : MonoBehaviour
             estadoDespuesJugador1 = builder.ToString();
 
             //print("Actual: " + estadoActualJugador1);
-            print("Jugada: " + jugadaRandom);
-            print("Random J1: " + estadoDespuesJugador1);
+            //print("Jugada: " + jugadaRandom);
+            //print("Random J1: " + estadoDespuesJugador1);
 
         }
         else
@@ -154,8 +154,8 @@ public class QLearningJ2 : MonoBehaviour
             estadoDespuesJugador1 = builder.ToString();
 
             //print("Actual: " + estadoActualJugador1);
-            print("Jugada: " + mejorJugada);
-            print("Mejor Jugada J1: " + estadoDespuesJugador1);
+            //print("Jugada: " + mejorJugada);
+            //print("Mejor Jugada J1: " + estadoDespuesJugador1);
 
         }
 
@@ -264,8 +264,8 @@ public class QLearningJ2 : MonoBehaviour
         estadoActualJugador1 = builder.ToString();
         //estado despues se queda si actualizar, ya lo hara quando juegue J1
 
-        print("Jugada: " + jugadaRandom);
-        print("Jugada J2: " + estadoActualJugador1);
+        //print("Jugada: " + jugadaRandom);
+        //print("Jugada J2: " + estadoActualJugador1);
 
         if (Empate(estadoActualJugador1, guion)) //para el jugador 2 el empate es despues de la jugada del jugador 1
         {
@@ -284,8 +284,8 @@ public class QLearningJ2 : MonoBehaviour
         estadoActualJugador1 = builder.ToString();
         //estado despues se queda si actualizar, ya lo hara quando juegue J1
 
-        print("Jugada: " + jugadaRandom);
-        print("Jugada J2: " + estadoActualJugador1);
+        //print("Jugada: " + jugadaRandom);
+        //print("Jugada J2: " + estadoActualJugador1);
         finAprendizaje = false;
     }
 
@@ -309,11 +309,11 @@ public class QLearningJ2 : MonoBehaviour
             finAprendizaje = true;
 
             //print(dictionaryQ1.ToString()); //NOPE
-            foreach (KeyValuePair<string, float> kvp in dictionaryQ1)
+            /*foreach (KeyValuePair<string, float> kvp in dictionaryQ1)
             {
                 //textBox3.Text += ("Key = {0}, Value = {1}", kvp.Key, kvp.Value);
                 print(string.Format("Key = {0}, Value = {1}", kvp.Key, kvp.Value));
-            }
+            }*/
             //finAprendizaje = true;
         }
         //finPartida = true;
@@ -332,25 +332,25 @@ public class QLearningJ2 : MonoBehaviour
 
 		for ( int x=0;x<3;x++){ // miramos si hay victoria horizontal y vertical
 			if(tablero[x, 0].Equals(ficha) && tablero[x,0].Equals(tablero[x, 1]) && tablero[x, 0].Equals(tablero[x, 2])){
-                print("GANADO: FILA");
+               // print("GANADO: FILA");
                 return true;
                
 			}
 			else if(tablero[0, x].Equals(ficha) && tablero[0, x].Equals(tablero[1, x]) && tablero[0, x].Equals(tablero[2, x])){
-                print("GANADO: COLUMNA");
+                //print("GANADO: COLUMNA");
                 return true;
                
             }
         }
 
 		if(tablero[0, 0].Equals(ficha) && tablero[0, 0].Equals(tablero[1, 1]) && tablero[0, 0].Equals(tablero[2,2])){ //  si es \
-            print("GANADO: \\");
+            //print("GANADO: \\");
             return true;
                 
         }
 
         if (tablero[2,0].Equals(ficha) && tablero[2,0].Equals(tablero[1,1]) && tablero[2,0].Equals(tablero[0,2])){ //  si es /
-            print("GANADO: //");
+           // print("GANADO: //");
             return true;
                 
         }
@@ -367,7 +367,7 @@ public class QLearningJ2 : MonoBehaviour
                 return false;
             }
         }
-        print("EMPATE");
+       // print("EMPATE");
         return true;
         
 
@@ -376,7 +376,10 @@ public class QLearningJ2 : MonoBehaviour
 
 
 
-
+    public Dictionary<string, float> GetDictionary()
+    {
+        return dictionaryQ1;
+    }
 
 
 

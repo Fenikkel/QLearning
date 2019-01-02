@@ -28,7 +28,7 @@ public class QLearning : MonoBehaviour
     private const char equis = 'x';
     private const char laO = 'o';
 
-    private bool finAprendizaje = false;
+    public bool finAprendizaje = false;
     private bool finPartida = false;
 
 
@@ -66,71 +66,11 @@ public class QLearning : MonoBehaviour
     }
 
     void Update()
-    {
-        /* //SI NO HAY REFERENCIA A LA KEY DEVUELVE 0
-         bool printeado;
-         float value;
-         printeado = dictionaryQ1.TryGetValue("algo", out value);
-         print(printeado);
-         print(value);*/
-
-        
+    {     
         if (!finAprendizaje)
         {
             TurnoJugador1();
         }
-        
-        /*
-        if (!finAprendizaje)
-        {
-            
-            string guiones = "---xxxooo";
-            int[] pos = PosiblesJugadas("---------");
-
-            print(guiones[1].Equals(guion));
-            print(guiones[4].Equals(equis));
-
-            print(guiones[7].Equals(laO));
-
-
-            for (int i =0; i < pos.Length; i++)
-            {
-                print(pos[i]);
-            }
-            //print(pos.ToString());
-            
-            int[] pos = PosiblesJugadas("-x--o--x-");
-            for (int i = 0; i < pos.Length; i++)
-            {
-                print(pos[i]);
-            }
-            
-            //print(pos.ToString());
-            finAprendizaje = true;
-        }
-        */
-
-       
-
-
-
-    }
-
-    private void Testeando()
-    {
-        jugadaJugador1 = "---------2";
-        rewardCortoPlazoJugador1 = -1;
-
-        float valorJugada;
-        dictionaryQ1.TryGetValue(jugadaJugador1, out valorJugada); //recuerda, si no existe, devuelve un 0
-
-        //jugada = jugada + velocidad de aprendizaje * (recompensa corto plazo + factor de descuento * maximo de la posible futura jugada - jugada) //el estado inicial antes de hacer la jugada no cuenta para nada
-        print(valorJugada);
-        dictionaryQ1[jugadaJugador1] = valorJugada + velocidadAprendizaje * (rewardCortoPlazoJugador1 + (factorDescuento * 0) - valorJugada); //maximo futuro sera 0 porque no hay mas jugadas despues de ganar
-        dictionaryQ1.TryGetValue(jugadaJugador1, out valorJugada);
-        print(valorJugada);
-
-
     }
 
     private int[] PosiblesJugadas(string estadoActual)
@@ -181,8 +121,8 @@ public class QLearning : MonoBehaviour
             estadoDespuesJugador1 = builder.ToString();
 
             //print("Actual: " + estadoActualJugador1);
-            print("Jugada: " + jugadaRandom);
-            print("Random J1: " + estadoDespuesJugador1);
+            //print("Jugada: " + jugadaRandom);
+            //print("Random J1: " + estadoDespuesJugador1);
 
         }
         else
@@ -215,8 +155,8 @@ public class QLearning : MonoBehaviour
             estadoDespuesJugador1 = builder.ToString();
 
             //print("Actual: " + estadoActualJugador1);
-            print("Jugada: " + mejorJugada);
-            print("Mejor Jugada J1: " + estadoDespuesJugador1);
+            //print("Jugada: " + mejorJugada);
+            //print("Mejor Jugada J1: " + estadoDespuesJugador1);
 
         }
 
@@ -325,8 +265,8 @@ public class QLearning : MonoBehaviour
         estadoActualJugador1 = builder.ToString();
         //estado despues se queda si actualizar, ya lo hara quando juegue J1
 
-        print("Jugada: " + jugadaRandom);
-        print("Jugada J2: " + estadoActualJugador1);
+        //print("Jugada: " + jugadaRandom);
+        //print("Jugada J2: " + estadoActualJugador1);
     }
 
     private void FinPartida()
@@ -349,11 +289,12 @@ public class QLearning : MonoBehaviour
             finAprendizaje = true;
 
             //print(dictionaryQ1.ToString()); //NOPE
-            foreach (KeyValuePair<string, float> kvp in dictionaryQ1)
+            /*foreach (KeyValuePair<string, float> kvp in dictionaryQ1)
             {
                 //textBox3.Text += ("Key = {0}, Value = {1}", kvp.Key, kvp.Value);
                 print(string.Format("Key = {0}, Value = {1}", kvp.Key, kvp.Value));
             }
+            */
             //finAprendizaje = true;
         }
         //finPartida = true;
@@ -372,25 +313,25 @@ public class QLearning : MonoBehaviour
 
 		for ( int x=0;x<3;x++){ // miramos si hay victoria horizontal y vertical
 			if(tablero[x, 0].Equals(ficha) && tablero[x,0].Equals(tablero[x, 1]) && tablero[x, 0].Equals(tablero[x, 2])){
-                print("GANADO: FILA");
+                //print("GANADO: FILA");
                 return true;
                
 			}
 			else if(tablero[0, x].Equals(ficha) && tablero[0, x].Equals(tablero[1, x]) && tablero[0, x].Equals(tablero[2, x])){
-                print("GANADO: COLUMNA");
+                //print("GANADO: COLUMNA");
                 return true;
                
             }
         }
 
 		if(tablero[0, 0].Equals(ficha) && tablero[0, 0].Equals(tablero[1, 1]) && tablero[0, 0].Equals(tablero[2,2])){ //  si es \
-            print("GANADO: \\");
+            //print("GANADO: \\");
             return true;
                 
         }
 
         if (tablero[2,0].Equals(ficha) && tablero[2,0].Equals(tablero[1,1]) && tablero[2,0].Equals(tablero[0,2])){ //  si es /
-            print("GANADO: //");
+            //print("GANADO: //");
             return true;
                 
         }
@@ -407,13 +348,18 @@ public class QLearning : MonoBehaviour
                 return false;
             }
         }
-        print("EMPATE");
+        //print("EMPATE");
         return true;
         
 
     }
 
 
+    public Dictionary<string, float> GetDictionary()
+    {
+        return dictionaryQ1;
+    }
+   
 
 
 
